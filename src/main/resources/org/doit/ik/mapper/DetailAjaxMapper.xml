@@ -5,7 +5,7 @@
 
 <mapper namespace="org.doit.ik.mapper.DetailAjaxMapper">  
      <select id="imageview" resultType="org.doit.ik.domain.Section03VO">
-     SELECT t.tic_code, i.info, i.info_agenc, i.info_use, i.tic_pic_in ,i.info_note, i.info_host, i.info_num, i.info_link 
+     SELECT t.tic_code, i.info, i.info_agenc, i.info_use, i.tic_pic_in ,i.tic_pic_sp, i.info_note, i.info_host, i.info_num, i.info_link 
 	 FROM info i  JOIN ticket t ON  t.tic_code =  i.tic_code 
 	 WHERE t.tic_code = #{tic_code}      
      </select>

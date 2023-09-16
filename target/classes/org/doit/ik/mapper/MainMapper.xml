@@ -28,9 +28,11 @@
 				        GROUP BY tic_code 
 				    ), 
 				    maxSale AS ( 
-				        SELECT MAX(GWON_SALE) sale, tic_code 
+				        SELECT DISTINCT MAX(GWON_SALE) AS sale, tic_code 
 				        FROM opt o 
-				        JOIN gwon g ON o.o_code = g.o_code 
+				        JOIN gwon g ON o.o_code = g.o_code
+				        LEFT JOIN registration r ON r.regi_num = g.regi_num
+				        WHERE g.regi_num IS NULL OR sysdate BETWEEN r.regi_stime AND r.regi_etime 
 				        GROUP BY tic_code 
 				    ), 
 				    timesale AS ( 
@@ -71,7 +73,7 @@
 				    LEFT JOIN todaysale ON todaysale.tic_code = a.tic_code
 				    LEFT JOIN sumticket ON sumticket.tic_code = a.tic_code
 				 ) 
-				 WHERE TRUNC(sysdate - tic_regist) <= 7
+				 WHERE 0 <= TRUNC(sysdate - tic_regist) AND TRUNC(sysdate - tic_regist) <= 7
 				  ]]>
      </select>
     
@@ -260,9 +262,11 @@
 				        GROUP BY tic_code 
 				    ), 
 				    maxSale AS ( 
-				        SELECT MAX(GWON_SALE) sale, tic_code 
+				        SELECT DISTINCT MAX(GWON_SALE) AS sale, tic_code 
 				        FROM opt o 
-				        JOIN gwon g ON o.o_code = g.o_code 
+				        JOIN gwon g ON o.o_code = g.o_code
+				        LEFT JOIN registration r ON r.regi_num = g.regi_num
+				        WHERE g.regi_num IS NULL OR sysdate BETWEEN r.regi_stime AND r.regi_etime 
 				        GROUP BY tic_code 
 				    ), 
 				    timesale AS ( 
@@ -321,6 +325,8 @@
 				        SELECT MAX(GWON_SALE) sale, tic_code 
 				        FROM opt o 
 				        JOIN gwon g ON o.o_code = g.o_code 
+				        JOIN registration r ON r.regi_num = g.regi_num
+				        WHERE sysdate BETWEEN r.regi_stime AND r.regi_etime
 				        GROUP BY tic_code 
 				    ), 
 				    timesale AS ( 

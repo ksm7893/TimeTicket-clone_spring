@@ -307,7 +307,7 @@
   <div class="basket_title">이용자정보</div>
   <div class="basket_text">
     <p>· 실제로 관람/이용하실 분의 실명/연락처를 입력해 주세요.</p>
-	<p>· 오기재시 정상 이용 및 긴급연락이 불가할 수 있으며 이에 따른 책임을 지지 않습니다.</p>
+   <p>· 오기재시 정상 이용 및 긴급연락이 불가할 수 있으며 이에 따른 책임을 지지 않습니다.</p>
   </div>
 
  <div class="basket_box">
@@ -326,6 +326,7 @@
     <input class="basket_input" type="hidden" name="mem_id" value="<sec:authentication property="principal.member.mem_id"/>">
   </div>
  
+ <div class="basket_title">포인트 사용</div>
  <div class="basket_text" style="margin-top:10px;">
     <div class="basket_subtitle" style="float:left;">· 보유 포인트</div>
     <p class="point_span point_available" value="<sec:authentication property="principal.member.mem_point"/>" style=" color:#303388;"=""><sec:authentication property="principal.member.mem_point"/>p
@@ -337,9 +338,9 @@
       <span><span class="point_use use_point_btn" onclick="USE_POINT('use')">사용하기</span></span>
       <span><span class="point_use use_point_all_btn" onclick="USE_POINT('useAll')" style="background:#942323;">포인트 모두사용</span></span>
     </p>
-	</div>
-	
-	<%-- 
+   </div>
+   
+   <%-- 
   <div class="basket_title" style="margin-top:20px;">
     <span>총 결제금액
     <span id="total_price_view" class="pay_total pay_total_price" value="${ param.총금액 }-">${ param.총금액 }원</span>
@@ -384,7 +385,7 @@
           <div style="padding:2px 0 3px 0">
             <img id="pay_toss_img" class="payment_img" src="../resources/images/pay_tosspay_off.png?5">
             <p style="margin-top:-10px;">토스페이</p>
-            <p class="pay_toss_event" style="font-size:11px;">3000원 캐시백</p>
+            <p class="pay_toss_event" style="font-size:11px;">2000원 캐시백</p>
           </div>
         </label>
 
@@ -441,7 +442,7 @@
       </div>
       <div id="payment_tosspay_noti" class="payment_noti" style="display:none;line-height: 160%; background: #e6e8ff; ">
         <p style="font-size:16px;">🎁 토스페이 결제 EVENT</p>
-        · 1만원 이상 생애 첫 결제시 3천원 즉시 캐시백<br />
+        · 토스페이 생애 첫 결제시 2천원 즉시 캐시백<br />
         · 이벤트 페이지에서 유의사항을 확인해주세요! (<a href="event.php?no=2023_toss" style="text-decoration: underline; color:blue;">바로가기</a>)
       </div>
     </div>
@@ -455,7 +456,7 @@
       <div class="refund_txt">
         ${ dto2.ref_rule }
         ${ dto2.ref_cau }
-		${ dto2.ref_way }
+      ${ dto2.ref_way }
       </div>
     </div>
   </div>
@@ -463,9 +464,9 @@
   <div class="basket_title" style="padding-top:10px;">
     ※ 주의사항 및 약관
     <span class="policy_slide" onclick="toggleSlide(POLICY_CONTENTS[1])">보기</span>
-		<div class="policy_contents">
-			<div class="refund_txt">
-				<p class='viewpage_noti'>[예매시 주의사항]</p>
+      <div class="policy_contents">
+         <div class="refund_txt">
+            <p class='viewpage_noti'>[예매시 주의사항]</p>
   <p>· 공연티켓은 <span style='color:red;'>관람 당일에는 환불/변경이 불가</span>합니다.<br />
   · 지각/지역착오/연령미숙지로 티켓을 사용하지 못한 경우라도 환불/변경이 불가합니다.<br />
   <p>· 각 티켓마다 이용방법 및 환불규정에 차이가 있으니, 반드시 <span style='color:blue;'>상세페이지의 안내사항 및 환불규정을 정확히 확인</span>하신 뒤 예매를 진행하시기 바랍니다.<br />
@@ -476,9 +477,9 @@
   · 제공 목적 : 티켓 본인 사용체크 및 본인확인, 예약 서비스 제공 시 본인확인, 결제서비스 대행<br />
   · 제공 항목 : 구매자 이름, 구매자 전화번호, 구매자 이메일, 관람자 이름, 관람자 전화번호
   
-			</div>
-		</div>
-	</div>
+         </div>
+      </div>
+   </div>
 
   <div class="check_box">
     <div>
@@ -491,8 +492,6 @@
         <span style="color:blue;">&nbsp;공연티켓은 관람당일 환불/변경이 절대 불가</span>한 점에 동의합니다.(지각, 지역착오, 연령미준수로 인한 환불불가)
       </label>
     </div>
-
-    
 
     <div class="pay_btn">
       <button type="button" id="pay_confirm">결제하기</button>
@@ -537,78 +536,78 @@ const AUTO_HYPHEN_PHONE = (number) => {
 <script>
 
 $(":radio").on("click",function(){
-	if($(this).val().indexOf("토스페이") == 0) {
-		$("#payment_tosspay_noti").css("display","block");
-		$("#payment_bank_noti").css("display", "none"); 
-	}
-	else if($(this).val().indexOf("무통장입금") == 0) {
-		$("#payment_bank_noti").css("display","block")
-		$("#payment_tosspay_noti").css("display", "none"); 
-		}
-	else{
-		$("#payment_bank_noti").css("display", "none"); 
-	  	$("#payment_tosspay_noti").css("display", "none"); 
-	   }
-	
+   if($(this).val().indexOf("토스페이") == 0) {
+      $("#payment_tosspay_noti").css("display","block");
+      $("#payment_bank_noti").css("display", "none"); 
+   }
+   else if($(this).val().indexOf("무통장입금") == 0) {
+      $("#payment_bank_noti").css("display","block")
+      $("#payment_tosspay_noti").css("display", "none"); 
+      }
+   else{
+      $("#payment_bank_noti").css("display", "none"); 
+        $("#payment_tosspay_noti").css("display", "none"); 
+      }
+   
 });
 
 $("#pay_confirm").on("click",function(){
-	const NAME_REGX = /[^a-z|A-Z|ㄱ-ㅎ|가-힣]+$/i;
-	
-	if(!($(":radio").is(":checked"))){
-		alert("결제 방법을 선택해주세요")
-		return ;
-	}else if(NAME_REGX.test($(":text[name=name]").val())){
-		alert("이름은 한글 또는 영문으로만 입력해주세요.");
-		$(":text[name=name]").focus();
-		return;
-	}else if($(":text[name=name]").val().length < 2){
-		alert("이용자 이름을 입력해 주세요")
-		return ;
-	}else if($(":text[name=hphone]").val().length < 10){
-		alert("휴대폰 번호를 입력해 주세요")     
-		return ;
-	}else if($(":text[name=email]").val().length < 7){
-		alert("E-Mail을 입력해 주세요")		 
-		return ;
-	}else if(!($("#check_1").is(":checked"))){
-		alert("환불규정, 주의사항, 약관에 동의하셔야 예매가 가능합니다")
-		return ;
-	}else if(!($("#check_2").is(":checked"))){
-		alert("관람 당일에는 환불/변경이 불가함에 동의하셔야 예매가 가능합니다")
-		return ;
-	}else{
-		alert("결제가 완료되었습니다");
-		$("form").submit();
-	}
+   const NAME_REGX = /[^a-z|A-Z|ㄱ-ㅎ|가-힣]+$/i;
+   
+   if(!($(":radio").is(":checked"))){
+      alert("결제 방법을 선택해주세요")
+      return ;
+   }else if(NAME_REGX.test($(":text[name=name]").val())){
+      alert("이름은 한글 또는 영문으로만 입력해주세요.");
+      $(":text[name=name]").focus();
+      return;
+   }else if($(":text[name=name]").val().length < 2){
+      alert("이용자 이름을 입력해 주세요")
+      return ;
+   }else if($(":text[name=hphone]").val().length < 10){
+      alert("휴대폰 번호를 입력해 주세요")     
+      return ;
+   }else if($(":text[name=email]").val().length < 7){
+      alert("E-Mail을 입력해 주세요")       
+      return ;
+   }else if(!($("#check_1").is(":checked"))){
+      alert("환불규정, 주의사항, 약관에 동의하셔야 예매가 가능합니다")
+      return ;
+   }else if(!($("#check_2").is(":checked"))){
+      alert("관람 당일에는 환불/변경이 불가함에 동의하셔야 예매가 가능합니다")
+      return ;
+   }else{
+      alert("결제가 완료되었습니다");
+      $("form").submit();
+   }
 });
 
 $(".policy_slide:first").on("click", function() {
-	var policyContents = $(".policy_contents");
+   var policyContents = $(".policy_contents");
     if (policyContents.first().css("display") === "none") {
         policyContents.first().css("display", "block");
     } else {
-    	policyContents.first().css("display", "none");
+       policyContents.first().css("display", "none");
     }
 });
 
 $(".policy_slide:last").on("click", function() {
-	var policyContents = $(".policy_contents");
+   var policyContents = $(".policy_contents");
     if (policyContents.last().css("display") === "none") {
         policyContents.last().css("display", "block");
     } else {
-    	policyContents.last().css("display", "none");
+       policyContents.last().css("display", "none");
     }
 });
 
 $(".use_point_btn").on("click", function(event) {
 
-	if($(".input_detail").val() < 500){
-    	alert("포인트는 최소 500P부터 사용 가능해요.");
-    	$(".input_detail").focus();
-    	return;
+   if($(".input_detail").val() < 500){
+       alert("포인트는 최소 500P부터 사용 가능해요.");
+       $(".input_detail").focus();
+       return;
     }
-	
+   
 });
 
 </script>

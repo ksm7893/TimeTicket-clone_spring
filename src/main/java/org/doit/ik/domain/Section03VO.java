@@ -15,6 +15,7 @@ public class Section03VO {
 	private String info_agenc;
 	private String info_use;
 	private String tic_pic_in;
+	private String tic_pic_sp;
 	private String info_note;
 	private String info_host;
 	private String info_num;

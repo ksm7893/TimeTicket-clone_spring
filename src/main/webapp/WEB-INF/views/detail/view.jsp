@@ -225,7 +225,6 @@ a {
 }
 </style>
 
-
 <style>
 .shadetabs ul, li {list-style:none; margin:0; padding:0;  }
 
@@ -548,6 +547,11 @@ height:auto;
 	width: 100%;
 	height: auto;
 }
+
+/* 상세 이미지 스타일   */
+.main_img { margin-top:35px; width:700px; text-align: center; }
+.main_img img { display:block; width:100%; }
+
 </style>
 
 <style>
@@ -556,61 +560,129 @@ height:auto;
 </style>
 
 
-<!-- 처음 뿌려지는 지도 -->
-<script>
-      				// Initialize and add the map
-				      function initMap() {
-				        // The location of Uluru
-				        const uluru = { lat: ${pdto.place_lat}, lng: ${pdto.place_lon} };
-				        // The map, centered at Uluru
-				        const map = new google.maps.Map(document.getElementById("map"), {
-				          zoom: 4,
-				          center: uluru,
-				        });
-				        // The marker, positioned at Uluru
-				        const marker = new google.maps.Marker({
-				          position: uluru,
-				          map: map,
-				        });
-				      }
-</script>
-			
-			
-<!-- 메뉴영역 버튼 클릭시 에이작스 처리되는 지도 -->
-<script>
-var map3;
 
-function initMap3() {
-  	map3 = new google.maps.Map(document.getElementById("map")
-  			, {
-				center: new google.maps.LatLng(${pdto.place_lat}, ${pdto.place_lon}),
-				zoom: 15
-			  });
-  	
-  	var myIcon3 = {
-  	        url: '/resources/images/default-marker.png',
-  	        size: new google.maps.Size(50, 50),
-  	        origin: new google.maps.Point(0, 0),
-  	        anchor: new google.maps.Point(25, 25)
-  	      };
-  	
-  	var marker3 = new google.maps.Marker({
-  	    position: new google.maps.LatLng(${pdto.place_lat}, ${pdto.place_lon}), 
-  	    map: map3,
-  	    icon: myIcon3
-  	});
-		} 
-</script>
+
+			
+	<!-- 에이작스 처리후, 다른 에이작스 메뉴영역에 안내 버튼 클릭시 다시 에이작스 처리되는 지도 -->			
+	<script>
+	var map3;
+	
+	function initMapAjax() {
+	  	mapAjax = new google.maps.Map(document.getElementById("map")
+	  			, {
+					center: new google.maps.LatLng(${pdto.place_lat}, ${pdto.place_lon}),
+					zoom: 15
+				  });
+	  	
+	  	var myIconAjax = {
+	  	        url: '/resources/images/default-marker.png',
+	  	        size: new google.maps.Size(50, 50),
+	  	        origin: new google.maps.Point(0, 0),
+	  	        anchor: new google.maps.Point(25, 25)
+	  	      };
+	  	
+	  	var markerAjax = new google.maps.Marker({
+	  	    position: new google.maps.LatLng(${pdto.place_lat}, ${pdto.place_lon}), 
+	  	    map: mapAjax,
+	  	    icon: myIconAjax
+	  	});
+			} 
+	</script>
+	
+	
+	<!-- 에이작스 처리 후, 안내 에이작스 메뉴영역에 펼쳐보기 버튼 클릭시 다시 처리되는 에이작스임 -->
+	<script>
+    	function viewimg(){
+
+
+				   	  document.querySelector('.info_detail_gradient').remove();   
+				   	  document.querySelector('.info_detail_btn').remove();     	   
+		              document.querySelector('.info_detail_poster').setAttribute("style", "display:none;");
+		              document.querySelector('.main_img').scrollIntoView({ behavior: 'smooth', block: 'start'});
+		              
+		              var tic_code = "${param.tic_code}";
+		              
+		              $.ajax({
+		                  url:"/ajaxview/imgview",
+		                  dataType:"json",
+		                  type:"GET", 
+		                  data:{tic_code:tic_code}, 
+		                  cache:false,
+		                  success:function (data, textStatus, jqXHR){
+		                	  console.log(data);
+				                
+		                  	  $(".main_img").html(data.tic_pic_sp);         	
+                	
+		                  } // function
+		              }) // ajax
+		   }; // click (펼쳐보기)
+	</script>
+
+
+	<!-- 에이작스 처리 후, 안내 에이작스 메뉴영역에 환불규정 바로가기 버튼 클릭시 다시 처리되는 에이작스임 -->
+	<script>
+		function refund_ajax() {
+					// alert("여러번 클릭");
+				   
+					var tic_code = "${param.tic_code}";	
+				   			    
+							$.ajax({
+								url:"/ajaxview/4",
+								dataType:"json",
+								data:{tic_code : tic_code},
+								cache:false,
+								success:function (data, textStatus, jqXHR){
+								
+									console.log(data);	
+									
+												// 안내, 장소, 환불규정 기존의 내용 없애기
+												$('.main_tab_wrap').remove();
+												// 후기 기존의 내용 없애기 (후기 있을 때)
+												$('.score_wrap').remove();	
+												// 후기 기존의 내용 없애기 (후기 없을 때)
+												$('#noreviews').remove();
+												
+												
+												// 여기까지 하면 환불규정 에이작스 메뉴 밑 내용 모두 사라짐
+												
+												
+												 // 환불규정 에이작스 메뉴 밑 내용 새로 뿌리기 위한 main_tab_wrap 클래스를 가지는 div 태그 만들기
+								        	 	$("#ajaxcontentarea").append(`<div class='main_tab_wrap' style=';'><p class='main_tab_title'>환불규정 및 안내사항</p></div>`);
+								        	 	// console.log(data);
+					        	 	
+								        	 	$( data ).each( function (i, elem){
+										                	 		   // 데이터 뿌리기 위한 정보 가져오기 시작 (정보는 ref 라는 변수에 담김)
+											                		   var ref = `<div class='viewpage_text radius_box' style='margin-top:10px; border-radius: 10px 10px 0 0;'>
+														                			   \${elem.ref_rule}
+														                			   \${elem.ref_cau == null?"":elem.ref_cau}
+														                			   \${elem.ref_way}
+													                			   </div>`;
+								            	
+												// ref 라는 변수를 main_tab_wrap 클래스를 가진 div 안에 넣어 안내 내용이 뿌려지게 한다.
+								            	$(ref).appendTo($(".main_tab_wrap")); 
+								            
+		            		   
+		            	 	}); // each
+						} // success function
+					}) // ajax	
+					
+					// 안내 에이작스 메뉴영역에 환불규정 바로가기 링크 다시 클릭시 적용되는 css(환불규정 메뉴 문구 빨간색 글자로 변환)
+					$('#maintab li').removeClass('selected');
+					$("#refund_link").addClass('selected');
+			}; // function
+	</script>
+
 </head>
 
 
 
+
+
+
 <body style="background-color: #fff; height: auto;">
-
-
- 	<div style="background-color: #f6f6f6; padding-top:10px; padding-bottom:50px;">
- 	
+ 	<div style="background-color: #f6f6f6; padding-top:10px; padding-bottom:50px;">	
 	<div style="padding-top: 20px; width: 815px; margin: 0 auto;">
+	
 	<c:choose>
 		<c:when test="${vdto.lcate_name eq '공연'}">
 			<div class="now_engine">
@@ -621,7 +693,7 @@ function initMap3() {
 		
 		<c:when test="${vdto.lcate_name eq '클래스'}">
 			<div class="now_engine">
-				🗂️ <a href='/timeticket/list.do?lcate_code=lcate_5'>${ vdto.lcate_name } > </a><a href='/timeticket/list.do?lcate_code=lcate_5&scate_code=scate_3''>${ vdto.scate_name }
+				🗂️ <a href='/timeticket/list.do?lcate_code=lcate_5'>${ vdto.lcate_name } > </a><a href='/timeticket/list.do?lcate_code=lcate_5&scate_code=scate_3'>${ vdto.scate_name }
 					> </a>
 			</div>
 		</c:when>
@@ -635,20 +707,21 @@ function initMap3() {
 		
 		
 		<div style="float: left; position: relative; width: 482px; margin-right: 20px; border-radius: 10px;">
-			<img src='/resources/images/${ vdto.tic_back }'
-      style="width:482px; height: 482px; border-radius:10px;" onError="this.style.visibility='hidden'"> 
+			<img src='/resources/images/${ vdto.tic_back }' style="width:482px; height: 482px; border-radius:10px;" onError="this.style.visibility='hidden'"> 
 			<div class="info_bg_gradient"></div>
 
 	
 
 			<!-- 타임세일/오늘티켓 아이콘 노출-->
 			<div style="position: absolute; top: 15px; left: 15px; display: flex;">
-				<c:if test="${ vdto.new_bar <= 7 }">
+				<c:if test="${  0 <= vdto.new_bar && vdto.new_bar <= 7 }">
 					<span class='promo_new'>NEW</span>
 				</c:if> 
+				
 				<c:if test="${tdvdto.gwon_name eq '오늘할인'}">
 					<span class='promo_today'>${ tdvdto.gwon_name }</span>
 				</c:if>
+				
 				<c:if test="${tvdto.gwon_name eq '타임세일'}">
 					<span class='promo_timesale'>${ tvdto.gwon_name }</span>
 				</c:if>
@@ -659,25 +732,26 @@ function initMap3() {
 			<!-- 타임세일/오늘할인 배너 -->
 			<div style="">
 
-
-
 				<!-- 타임세일 안내 영역 -->
 				<c:if test="${tvdto.gwon_name eq '타임세일' }">
 					<div class="promo_box" style="background: #FFE9E9; border: 1px solid #fde3e3;">
 						<div style="font-weight: 700; color: #FF4B4B;">
-						${ tvdto.gwon_name	} 진행중 ⏰ 
+						${ tvdto.gwon_name	} 진행중 ⏰ 							
 							<span style="font-size: 14px; color: #555; font-weight: 400;">
 							회차당 2~3매 선착순 최저가
-							</span>
+							</span>						
 						</div>
+						
 						<div class="promo_datetime" style="padding: 5px 15px; background: #ff4b4b;">
 						~${ tvdto.ts_etime }
 						</div>
+						
 						<div class="promo_btn_circle">
 							<a href="/timeticket/sale.do?type=timesale"> 
 							<img src="/resources/images/btn_circle_right.png" />
 							</a>
 						</div>
+						
 					</div>
 				</c:if>
 
@@ -687,21 +761,21 @@ function initMap3() {
 						style="background: #EDFFE5; border: 1px solid #d8f5cc;">
 						<div style="font-weight: 700; color: #459E26;">
 						${ tdvdto.gwon_name } 적용중 🎉 
-						<span style="font-size: 14px; color: #555; font-weight: 400;">
-						오늘은 마감되었어요. 내일을 기다려주세요!
-						</span>
+						<span style="font-size:14px; color:#555; font-weight:400;">오늘 추가로 할인되는 티켓이 있어요!</span>
 						</div>
-						<div class="promo_datetime" style="padding: 5px 0 5px 15px; width: 105px; background: #459E26;" id="today_timer">
+						<div class="promo_datetime" style="padding: 5px 0 5px 15px; width: 105px; background: #459E26;" id="today_timer">						
+						</div>
 						
-						</div>
 						<div class="promo_btn_circle">
 							<a href="section.php?&page=promo&type=today"> 
 							<img src="/resources/images/btn_circle_right.png" />
 							</a>
 						</div>
+						
 					</div>  					
 				</c:if>
 			</div>
+
 
 			<script>
 		      // 오늘할인 타이머
@@ -753,36 +827,37 @@ function initMap3() {
 			<!-- 포스터 옆 정보영역 -->
 			<div style="position: absolute; top: 181px; left: 183px;">
 				<div class="info-warp">
+				
 				<c:choose>
+				
 					<c:when test="${vdto.lcate_name eq '공연'}">
 					<div class="icon">
-						<span>${ vdto.reg_name }</span>
+						<span>${ vdto.tic_loc }</span>
 						<span>${ vdto.scate_name }</span>
 					</div>
 					</c:when>
-					<c:when test="${vdto.lcate_name eq '클래스'}">
-					<div class="icon">
-						<span>${ vdto.reg_name }</span>
-						<span>${ vdto.lcate_name }</span>
-					</div>
-					</c:when>
+					
 					<c:otherwise>
 					<div class="icon">
-						<span>${ vdto.reg_name }</span>
+						<span>${ vdto.tic_loc }</span>
 						<span>${ vdto.lcate_name }</span>
 						</div>
 					</c:otherwise>
+					
 				</c:choose>
+				
 					<p style="padding-top: 10px; font-size: 14px; font-weight: 300; color: #fff;">
 					${ vdto.tic_class }
 					</p>
 
 					<p class="title" style="padding-top: 5px;">${ vdto.tic_name }</p>
+					
 					<div class="openrun">
 						<p class="run_tit">
 							<img src="/resources/images/ico_calendar.png">
 							${ vdto.tic_run_ti }
-							</p>
+						</p>
+						
 						<p class="run_info">
 							<span>
 							<img src="/resources/images/ico_clock.png">
@@ -793,11 +868,13 @@ function initMap3() {
 							${ vdto.tic_age }
 							</span>
 						</p>
+						
 						<p class="run_tit">
 							<img src="/resources/images/ico_location_w.png">
 								${pdto.place}
 						</p>
 					</div>
+					
 				</div>
 			</div>
 
@@ -807,10 +884,13 @@ function initMap3() {
 				<div class="price_warp">
 					
 					<c:choose>
-					<c:when test="${vdto.lcate_name eq '공연' || vdto.lcate_name eq '클래스'}">
+					
+					<c:when test="${ '공연' eq vdto.lcate_name }">		
 					<div class="sale_info">
-						<p class="sale_p">최대 ${ vdto.gwon_sale }% 할인</p>					
+						<p class="sale_p">최대 ${ vdto.gwon_sale }% 할인</p>	
+						<p class="sale_txt">1인 세일가 기준</p>	
 					</div>
+					
 					<div class="price_info">
 						<span class="origin_price">
 						<fmt:formatNumber value="${ vdto.tic_price }" pattern="#,###원" />
@@ -820,16 +900,70 @@ function initMap3() {
 						</span>						
 					</div>
 					</c:when>
-					<c:otherwise>
+					
+					
+					
+					<c:when test="${ '전시' eq vdto.lcate_name }">
 					<div class="sale_info">
-						<p class="sale_p">최대 ${ vdto.gwon_sale }% 할인</p>					
-					</div>
+						<p class="sale_p">타임티켓가</p>	
+						<p class="sale_txt">일반 입장권 기준</p>
+					</div>	
+	
 					<div class="price_info">
 						<span class="sale_price">
 						<fmt:formatNumber value="${ vdto.sale_pay }" pattern="#,###원" />
 						</span>			
+					</div> 
+					</c:when>
+										
+					
+					<c:when test="${ '체험' eq vdto.lcate_name }">		
+					<div class="sale_info">
+						<p class="sale_p">최대 할인가</p>	
+						<p class="sale_txt">1인 체험권 기준</p>	
+					</div>
+					
+					<div class="price_info">
+						<span class="origin_price">
+						<fmt:formatNumber value="${ vdto.tic_price }" pattern="#,###원" />
+						</span> 
+						<span class="sale_price">
+						<fmt:formatNumber value="${ vdto.sale_pay }" pattern="#,###원" />
+						</span>						
+					</div>
+					</c:when>
+														
+					
+					<c:when test="${vdto.lcate_name eq '클래스' &&  0 eq vdto.gwon_sale}">
+					<div class="sale_info">	
+						<p class="sale_p">타임티켓가</p>	
+						<p class="sale_txt">1인 이용권 기준</p>	
+					</div>
+					
+					<div class="price_info">
+						<span class="sale_price">
+						<fmt:formatNumber value="${ vdto.sale_pay }" pattern="#,###원" />
+						</span>						
+					</div>
+					</c:when>
+					
+					
+					<c:otherwise>
+					<div class="sale_info">
+						<p class="sale_p">최대 할인가</p>
+						<p class="sale_txt">1인 이용권 기준</p>	
+					</div>
+					
+					<div class="price_info">
+						<span class="origin_price">
+						<fmt:formatNumber value="${ vdto.tic_price }" pattern="#,###원" />
+						</span> 
+						<span class="sale_price">
+						<fmt:formatNumber value="${ vdto.sale_pay }" pattern="#,###원" />
+						</span>						
 					</div>
 					</c:otherwise>
+					
 					</c:choose>
 					
 				</div>
@@ -837,8 +971,10 @@ function initMap3() {
 		</div>
 
 
-		<!-------- 우측 옵션선택영역 시작(민종오빠 부분) -------->
-		
+
+		<!-------- 우측 옵션선택영역 시작  -------->	
+	
+		<!-- (달력) -->
 		<section style="float: right; width: 307px;">
 		<div id="calendar_popup" class="calendar_popup_02" style="">
 			<div class="popup_warp">
@@ -1266,23 +1402,6 @@ function adjust_ticket(mode, t) {
 		<section style="width: 820px; margin: 0 auto; padding-top: 20px;">
 			<div class="review_preview" style="">
 						
-						<!-- <script>
-							// 더보기 버튼 처리
-							    function showFullReviewForSample(selected) {
-							      document.getElementById('sample_review' + selected).classList.add('show');
-							      document.getElementById('sample_seemore' + selected).setAttribute("style", "display: none;");
-							    }
-							
-							    function getMeta(url) {
-							      const img = new Image();
-							      img.addEventListener("load", function () {
-							        sessionStorage.setItem('width', this.naturalWidth);
-							        sessionStorage.setItem('height', this.naturalHeight);
-							      });
-							      img.src = url;
-							    }
-						</script> -->
-			
 			
 			<c:if test="${ p1dto.avg_rev ne 0.0}">
 				<div class="review_preview_container">
@@ -1293,16 +1412,20 @@ function adjust_ticket(mode, t) {
 							<span class="review_preview_title">평점</span> 
 							<span class="review_preview_number" style="color: #ff4b4b;">${ p1dto.avg_rev }/5</span>
 						</div>
-						<!-- <div class="review_preview_right">
+						
+						<!-- 
+						<div class="review_preview_right">
 							후기 더보기 
 							<span class="review_preview_right_btn"></span>
-						</div> -->
+						</div> 
+						 -->
+						 
 					</div>
 					
 					<div class="review_preview_samples">
 					
 						<c:forEach items="${plist}" var="p2dto" varStatus="i">
-							<div class="review_wrap" id="user_review1">
+							<div class="review_wrap" id="${p2dto.mem_name}">
 								<div class="review_title">
 									<div class="review_title_left">
 										<div class="review_title_left_stars">
@@ -1320,24 +1443,34 @@ function adjust_ticket(mode, t) {
 								</div>
 								
 								<div class="review_text">
-									<div class="review_text_area" id="text_862432">
+									<div class="review_text_area" id="${p2dto.mem_name}">
 										<c:out value="${p2dto.rev_cont}"/>
 									</div>
-									<!-- <div class="review_text_seemore" id="seemore" onclick="showFullReview()">... 더보기</div> -->
+									<!-- 
+									<div class="review_text_seemore" id="sample_seemore_0" onclick="showFullReviewForSample(0)">
+									... 더보기
+									</div>		
+									 -->		
 								</div>
+								
+								
+								<!-- 후기 길때, 더보기 스크립트 처리-->
 						
+								
 								<div style="1; margin-top: 10px;">
 									<div viewmode="off" style="background-image: url(/resources/images/${p2dto.rev_img})" 
 										name="/resources/images/${p2dto.rev_img}" onclick="showOriginalRatio(0)" class="sample_img_label 0">
 									</div>
 								</div>
+								 
 							</div>
+							
 						</c:forEach>		
 						
 						</div>
 					</div>
-					</c:if>
-				</div>
+				</c:if>
+			</div>
 		</section>
 		
 		
@@ -1345,13 +1478,14 @@ function adjust_ticket(mode, t) {
 
 		 <section style="width: 820px; margin: 0 auto; padding-top: 20px;">
 
-			<!-- 메뉴영역, js/ajaxtabs.css -->
+			<!-- 에이작스 메뉴영역 -->
 			<ul id="maintab" class="shadetabs FixedTopMenu" style="border-radius: 10px 10px 0 0;">
-				<li id="tab_01_notice" class="selected" onclick="loadKakaoMap();">
+				<li id="tab_01_notice" class="selected" >
 					<a class="tabLink" href="#default" rel="ajaxcontentarea" data-no="0">
 						<span>안내</span>
 					</a>
 				</li>
+				
 				<li>
 				<a data-no="1">
 					<span>후기
@@ -1359,6 +1493,7 @@ function adjust_ticket(mode, t) {
 					</span>
 				</a>						
 				</li>
+				
 				<!-- <li>
 					<a data-no="2">
 						<span>Q&amp;A
@@ -1368,17 +1503,22 @@ function adjust_ticket(mode, t) {
 						</span>
 					</a>
 				</li> -->
+				
 				<li>
 				<a data-no="3">
 				<span>장소</span>
 				</a>
 				</li>
-				<li><a data-no="4">
+				
+				<li id="refund_link">
+				<a data-no="4">
 				<span>환불규정</span>
 				</a>
 				</li>
 			</ul>
 
+
+		<!-- 에이작스 메뉴 영역 각각 클릭 메뉴 글자에 빨간색 css 효과  -->
 		<script>
 		$(document).ready(function() {
 			  $('#maintab li').click(function() {
@@ -1389,263 +1529,334 @@ function adjust_ticket(mode, t) {
 		</script>
 		
 		
+		
+		<!-- 에이작스 데이터 처리 -->
 		<script>
 		
- $(function (){
-	 $("#maintab a").on("click", function (event){
-		 // console.log( $(this).data("no") );
-		 //document.querySelector('.main_tab_wrap').remove();
-	            
-				    var tic_code = "${param.tic_code}";
-		 			var type =  $(this).data("no"); 
-				    var that = this;
-				    
-				    $.ajax({
-				           url:"/ajaxview/"+type,
-				           dataType:"json",
-				           type:"GET", 
-				           data:{tic_code:tic_code}, 
-				           cache:false,
-				           success:function (data, textStatus, jqXHR){
-				        	   console.log(data);	
-				         
-				        	// type0
-		                	 	if ($(that).data("no")=="0") {
-		                	 		$('.main_tab_wrap').remove();	
-		                	 		$('.score_wrap').remove();
-		                	 		$('#noreviews').remove();
-		                	 		$("#ajaxcontentarea").append(`<div class='main_tab_wrap' style=';'></div>`); 
-		                	 		
-		                	 		$(  data ).each( function (i, elem){
-
-					                		   var info = `<div style='display: none;; width: 700px; height: 95px; margin-bottom: 20px;'>
-					       						<img src='img/bnr_class_noti.png'
-					   							style='width: 700px; border-radius: 10px;' alt='예매전 주의사항 - 클래스' />
-					   							</div>
-
-							   					<div style='margin-top: 10px;'>
-							   						<div class='viewpage_noti'>예매정보</div>
-							   						<div class='viewpage_text radius_box'>\${elem.info}</div>
-							   					</div>`;
-							   					
-							   					if(elem.info_agenc){
-							   						info+=`<div style="margin-top: 25px;">
-							   							<div class="viewpage_noti">기획사 공지사항</div>
-							   							<div class="viewpage_text radius_box"> \${elem.info_agenc}</div>
-							   						</div>`;
-							   					} 
-							   					
-							   					info+= `<div style='margin-top: 25px;'>
-						   						<div class='viewpage_noti'>이용정보</div>
-						   						<div class='viewpage_text radius_box'>\${elem.info_use}</div>
-						   						</div>
-		
-						   					
-							   					<div class='info_detail_poster' alt='상세'>
-							   						<div class='info_detail_gradient'></div>
-							   							
-							   						<div class='info_detail_btn' 	id='mdetail_unfold' onclick="viewimg()">
-							   							펼쳐보기 
-							   							<img src='/resources/images/icon_down.png'
-							   							style='width: 13px; vertical-align: 2px; padding-left: 10px;'>
-							   						</div>		
-							   						</div>
-							   						
-							   						<div class='main_img'></div>
-							   						
-
-
-								   					<div style='margin-top: 25px;'>
-								   						<div class='viewpage_noti'>유의사항</div>
-								   						<div class='viewpage_text radius_box'>\${elem.info_note}</div>
-								   					</div>										   					
-								   	
-								   					<div style='margin-top: 25px;'>
-								   						<div class='viewpage_noti'>장소안내</div>
-								   						<div class='viewpage_text radius_box'
-								   							style='border-radius: 10px 10px 0 0;'>
-								   							<p>· 장소: \${elem.place}</p>
-								   							<p>· 주소: \${elem.place_add}</p>
-								   							<p>· 주차: \${elem.place_park}</p>
-								   						</div>
-								   						
-								   						<div align='center' style='margin-top: 10px;''>
-								   						
-								   						<div id='map' style='width:100%;height:400px'></div>
-								   						</div>
-								   						</div>
-								   						
-								   						<div style='margin-top: 25px; margin-bottom: 25px;'>
-								   						
-							   							<div class='viewpage_noti'>판매정보</div>
-
-							   							<div class='viewpage_text border_box'>
-							   								<div class='viewpage_flex'>
-							   									<div>주최/주관</div>
-							   									<div>\${elem.info_host}</div>
-							   								</div>
-							   							<div class='viewpage_flex'>
-							   									<div>문의전화</div>
-							   									<div>📞\${elem.info_num}</div>
-							   							</div>`;
-							   							
-							   							
-							   					if(elem.info_link){
-							   						info+= `<div class="viewpage_flex" >
-														<div>문의링크</div>
-														<div>
-															🔗 <a href="${elem.info_link}" target="_blank"
-																style="text-decoration: underline;">\${elem.info_link}</a>
-														</div>
-														</div>`;
-														}
-							   					
-							   					
-							   					
-														info+= `<div class='viewpage_flex'>
-					   									<div>환불규정</div>
-					   									<div>
-					   										<a href='#tab_view' data-no='4'><span>환불규정
-					   												바로가기</span></a>
-					   									</div>
-						   								</div>
-						   								<div class='viewpage_flex'>
-						   									<div>환불방법</div>
-						   									<div>마이티켓 &gt; 예매내역에서 직접 취소</div>
-						   								</div>
-						   							</div>
-								   				</div>
-											</div>`;
-							   					
-
-
-					   				
-					                		   
-					           
-					                		   $(info).appendTo($(".main_tab_wrap"));
-					                		   $("#map").append($("<script src='https://maps.googleapis.com/maps/api/js?key=AIzaSyASJkVY1x-BDuG1ySeXbNePbgZ25se-P6w&callback=initMap3' async defer><\/script>")); 
-						                		  
-					                		   
-					                	  }); // each
-								}// if 0 
-								
-								
-				                	 	// type1
-				                	 	if ($(that).data("no")=="1") {
-				                	 		$('.main_tab_wrap').remove();
-				                	 		$('.score_wrap').remove();			                	 	
-				                	 		$('#noreviews').remove();
-				                	 		// $("#ajaxcontentarea").append(`<div class='score_wrap' style=';'><div class='review_start' style=';'></div></div>`);
-				                	 			if(data.length==0){
-				                	 			console.log(data.length);				             
-								   				var noreviews = `<div id="noreviews" style="color:#666; border:1px solid #eee; border-top:none; border-radius:0 0 10px 10px; text-align:center; padding:100px 0 110px 0; font-size:18px; ">
-								   					</div>`
-								   					
-								   				$(noreviews).html("등록된 후기/별점이 없습니다.")
-								   									.appendTo($("#ajaxcontentarea"));
-				                	 		} else{
-				                	 			$("#ajaxcontentarea").append(`<div class='score_wrap' style=';'><div class='review_start' style=';'></div></div>`);
-						              
-				                	 			$( data ).each( function (i, elem){			
-							                		   var reviews = `<div class='review_wrap' id='user_review'>
-														<div class='review_title'>
-															<div class='review_title_left'>
-																<div class='review_title_left_stars'>
-																	<div class='review_title_left_star'>
-																		<div class='review_title_left_star_filled' style='width: calc(\${elem.rev_point} * 19px);'></div> 
-																	</div> 
-																</div>
-																<div class='review_title_left_name' style='padding-left: 10px;'>
-																	\${elem.mem_name}
-																</div> 
-															</div>
-															<div class='review_title_right' style='padding-right: 8px;'>
-																\${elem.rev_date}
-															</div>
-														</div>
-														
-														<div class='review_text'>
-															<div class='review_text_area' id='text_862432'>
-																\${elem.rev_cont}
-															</div>
-															<!-- <div class="review_text_seemore" id="seemore" onclick="showFullReview()">... 더보기</div> -->
-														</div>
-												
-														<div style='1; margin-top: 10px;'>
-															<div class='img_label' viewmode='off' style='background-image: url(/resources/images/\${elem.rev_img})' name='/images/\${elem.rev_img}' onclick='showOriginalRatio()''>
-															</div>
-														</div>
-													</div>` ;
-							           
-							                	$(reviews).appendTo($(".review_start"));
-							                		   														
-							                	   }); // each
-				                	 		} // if..else            	 		
-										}// if 1
-				                	   
-				                		 // type2
-				                	   else if ($(that).data("no")=="2") {
-				                		   
-				                			 
-				                	   }// if 2
-				                	   
-				                	   // type3
-				                	   else if ($(that).data("no")=="3") {	   
-				                		   $('.main_tab_wrap').remove();
-				                		   $('.score_wrap').remove();				                		 
-				                		   $('#noreviews').remove();
-				                	 	   $("#ajaxcontentarea").append(`<div class='main_tab_wrap' style=';'></div>`);
-						                	 
-				                		   $(  data).each( function (i, elem){
-				                		   var place = `<div class='main_tab_title'>장소안내</div>
-				                			   <div class='viewpage_text radius_box' style='margin-top:10px; border-radius: 10px 10px 0 0;'>
-				                			     <p>· 장소: \${elem.place}</p>
-				                			     <p>· 주소: \${elem.place_add}</p>
-				                			     <p>· 주차: \${elem.place_park}</p>
-				                			   </div>
-				                			   <div align='center' style='margin-top:10px;'>
-				                			     <div id='map' style='width:100%;height:400px'></div>
-				                			     `;
-				                			 
-				                		   $(place).appendTo($(".main_tab_wrap")); 
-				                		   $("#map").append($("<script src='https://maps.googleapis.com/maps/api/js?key=AIzaSyASJkVY1x-BDuG1ySeXbNePbgZ25se-P6w&callback=initMap3' async defer><\/script>")); 
-				                		  
-				                		   
-				                		   
-				                		   
-				                		   } ); // each 
-				                		    
-				                		   
-				                	   } // if 3
-				                	   
-										 else if ($(that).data("no")=="4") {
-											$('.main_tab_wrap').remove();
-											$('.score_wrap').remove();	
-											$('#noreviews').remove();
-					                	 	$("#ajaxcontentarea").append(`<div class='main_tab_wrap' style=';'><p class='main_tab_title'>환불규정 및 안내사항</p></div>`);
-					                	 	console.log(data);
-					                	 	$(  data ).each( function (i, elem){
-						                		   var ref = `<div class='viewpage_text radius_box' style='margin-top:10px; border-radius: 10px 10px 0 0;'>
-									                			   \${elem.ref_rule}
-									                			   \${elem.ref_cau == null?"":elem.ref_cau}
-									                			   \${elem.ref_way}
-									                			   </div>`;
-						                			 
-						                		   $(ref).appendTo($(".main_tab_wrap")); 
-						                		   
-						                		   } ); // each	
-				                	   }// if 4  */
-				                  }, error: function ( xhr, errorType){
-				       	        	  alert( errorType );
-				       	          }
-			
-}); // ajax				 
+			 $(function (){
+				 // 에이작스 메뉴 영역 각각 클릭시 이벤트 발생 
+				 $("#maintab a").on("click", function (event){
+					 // console.log( $(this).data("no") );
+				            
+							    var tic_code = "${param.tic_code}";
+					 			var type =  $(this).data("no"); 
+							    var that = this;
+							    
+							    
+							    $.ajax({
+							           url:"/ajaxview/"+type,
+							           dataType:"json",
+							           type:"GET", 
+							           data:{tic_code:tic_code}, 
+							           cache:false,
+							           success:function (data, textStatus, jqXHR){
+							        	//console.log(data);	
+							         
+							        	   
+							        	// type 0 (안내 버튼 클릭시)
+					                	 	if ($(that).data("no")=="0") {
+					                	 		// 안내, 장소, 환불규정 기존의 내용 없애기 
+					                	 		$('.main_tab_wrap').remove();	
+					                	 		// 후기 기존의 내용 없애기 (후기 있을 때)
+					                	 		$('.score_wrap').remove();
+					                	 		// 후기 기존의 내용 없애기 (후기 없을 때)
+					                	 		$('#noreviews').remove();
+					                	 		
+					                	 		// 여기까지 하면 안내 에이작스 메뉴 밑 내용 모두 사라짐
+					                	 		
+					                	 		
+					                	 		// 안내 에이작스 메뉴 밑 내용 새로 뿌리기 위한 main_tab_wrap 클래스를 가지는 div 태그 만들기
+					                	 		$("#ajaxcontentarea").append(`<div class='main_tab_wrap' style=';'></div>`); 
+					                	 		
+					                	 		
+					                	 		
+					                	 		$(  data ).each( function (i, elem){
+					                	 					// 데이터 뿌리기 위한 정보 가져오기 시작 (정보는 info 라는 변수에 담김)
+								                		   var info = `<div style='display: none;; width: 700px; height: 95px; margin-bottom: 20px;'>
+												       						<img src='img/bnr_class_noti.png'
+												   							style='width: 700px; border-radius: 10px;' alt='예매전 주의사항 - 클래스' />
+												   							</div>
+							
+														   					<div style='margin-top: 10px;'>
+														   						<div class='viewpage_noti'>예매정보</div>
+														   						<div class='viewpage_text radius_box'>\${elem.info}</div>
+														   					</div>`;
+														   					
+															if(elem.info_agenc){
+														   						info+=`<div style="margin-top: 25px;">
+														   							<div class="viewpage_noti">기획사 공지사항</div>
+														   							<div class="viewpage_text radius_box"> \${elem.info_agenc}</div>
+														   						</div>`;
+										   												} 
+															
+										   					
+										   					info+= `<div style='margin-top: 25px;'>
+													   						<div class='viewpage_noti'>이용정보</div>
+													   						<div class='viewpage_text radius_box'>\${elem.info_use}</div>
+													   					</div>
 					
-	 }); // click
- }) // function 
+									   					
+										   								<div class='info_detail_poster' alt='상세'>
+											   								<div class='info_detail_gradient'></div>
+											   							
+													   						<div class='info_detail_btn' id='mdetail_unfold' onclick="viewimg()">
+													   							펼쳐보기 
+													   						<img src='/resources/images/icon_down.png' style='width: 13px; vertical-align: 2px; padding-left: 10px;'>
+													   						</div>		
+												   						</div>
+												   						
+												   						<div class='main_img'></div>
+										   						
 			
-</script>
+			
+													   					<div style='margin-top: 25px;'>
+													   						<div class='viewpage_noti'>유의사항</div>
+													   						<div class='viewpage_text radius_box'>\${elem.info_note}</div>
+													   					</div>										   					
+											   	
+													   					<div style='margin-top: 25px;'>
+													   						<div class='viewpage_noti'>장소안내</div>
+													   						<div class='viewpage_text radius_box'
+													   							style='border-radius: 10px 10px 0 0;'>
+													   							<p>· 장소: \${elem.place}</p>
+													   							<p>· 주소: \${elem.place_add}</p>
+													   							<p>· 주차: \${elem.place_park}</p>
+													   						</div>
+											   						
+											   								<div align='center' style='margin-top: 10px;''>
+											   						
+														   						<div id='map' style='width:100%;height:400px'></div>
+														   						
+														   						</div>
+													   						</div>
+											   						
+												   						<div style='margin-top: 25px; margin-bottom: 25px;'>
+												   						
+											   							<div class='viewpage_noti'>판매정보</div>
+			
+											   							<div class='viewpage_text border_box'>
+											   								<div class='viewpage_flex'>
+											   									<div>주최/주관</div>
+											   									<div>\${elem.info_host}</div>
+											   								</div>
+											   								<div class='viewpage_flex'>
+											   									<div>문의전화</div>
+											   									<div>📞\${elem.info_num}</div>
+											   							</div>`;
+										   							
+										   							
+										   					if(elem.info_link){
+													   						info+= `<div class="viewpage_flex" >
+																						<div>문의링크</div>
+																						<div>
+																							🔗 <a href="${elem.info_link}" target="_blank"
+																								style="text-decoration: underline;">\${elem.info_link}</a>
+																						</div>
+																						</div>`;
+																					}
+										   					
+										   					
+										   					
+															info+= `<div class='viewpage_flex'>
+									   									<div>환불규정</div>									   									
+									   									<div>
+									   									<ul id="refund">
+									   									<li>
+									   										<a href='#default' data-no='4'  onclick="refund_ajax()" id="data-no-check"><span>환불규정
+									   												바로가기</span>
+									   										</a>
+									   									<li>
+									   									<ul>
+									   									</div>
+										   								</div>
+											   								<div class='viewpage_flex'>
+											   									<div>환불방법</div>
+											   									<div>마이티켓 &gt; 예매내역에서 직접 취소</div>
+											   								</div>
+											   							</div>
+														   				</div>
+																	</div>`;													
+														    // 데이터 뿌리기 위한 정보 가져오기 끝
 		
+								                		   
+								           				   // info라는 변수를 main_tab_wrap 클래스를 가진 div 안에 넣어 안내 내용이 뿌려지게 한다.
+								                		   $(info).appendTo($(".main_tab_wrap"));
+														   // map이라는 아이디를 가지는 div 바로 다음에 지도가 뿌려지도록 하는 스크립트가 추가된다.  
+								                		   $("#map").append($("<script src='https://maps.googleapis.com/maps/api/js?key=AIzaSyASJkVY1x-BDuG1ySeXbNePbgZ25se-P6w&callback=initMapAjax' async defer><\/script>")); 
+									                		  
+								                		   
+								                	  }); // each
+											} // type 0 (안내 버튼 클릭시) 
+											
+											
+											
+							                	 	// type 1 (후기 버튼 클릭시)
+							                	 	if ($(that).data("no")=="1") {
+							                	 		// 안내, 장소, 환불규정 기존의 내용 없애기						                	 		
+							                	 		$('.main_tab_wrap').remove();
+							                	 		// 후기 기존의 내용 없애기 (후기 있을 때)
+							                	 		$('.score_wrap').remove();		
+							                	 		// 후기 기존의 내용 없애기 (후기 없을 때)
+							                	 		$('#noreviews').remove();
+							                	 		
+							                	 		
+							                	 		// 여기까지 하면 후기 에이작스 메뉴 밑 내용 모두 사라짐
+							                	 		
+							                	 		
+							                	 		
+										                	 			// data의 길이가 0이라면? = 데이터가 없다면
+										                	 			if(data.length==0){
+										                	 			// console.log(data.length);		
+										                	 					
+										                	 					// 데이터 뿌리기 위한 정보 가져오기 시작 (정보는 noreviews 라는 변수에 담김)
+																   				var noreviews = `<div id="noreviews" style="color:#666; border:1px solid #eee; border-top:none; border-radius:0 0 10px 10px; text-align:center; padding:100px 0 110px 0; font-size:18px; ">
+																   											</div>`;
+																   				
+																   				// noreviews 라는 변수 즉, div 태그 안에 아래의 문구가 나오도록 함
+																   				$(noreviews).html("등록된 후기/별점이 없습니다.")
+																   				// noreviews 라는 변수를 ajaxcontentarea 아이디를 가진 div 안에 넣어 후기가 없을 떄의 내용이 뿌려지게 한다.
+																   									.appendTo($("#ajaxcontentarea"));
+																   											
+																   		// 데이터가 있다면									
+										                	 			} else{
+										                	 			// 후기 에이작스 메뉴 밑 내용 새로 뿌리기 위한 score_wrap 클래스를 가지는 div 태그 만들기
+										                	 			$("#ajaxcontentarea").append(`<div class='score_wrap' style=';'><div class='review_start' style=';'></div></div>`);
+												              
+										                	 			
+										                	 			$( data ).each( function (i, elem){			
+										                	 							   // 데이터 뿌리기 위한 정보 가져오기 시작 (정보는 reviews 라는 변수에 담김)
+																                		   var reviews = `<div class='review_wrap' id='user_review'>
+																														<div class='review_title'>
+																															<div class='review_title_left'>
+																																<div class='review_title_left_stars'>
+																																	<div class='review_title_left_star'>
+																																		<div class='review_title_left_star_filled' style='width: calc(\${elem.rev_point} * 19px);'></div> 
+																																	</div> 
+																																</div>
+																																<div class='review_title_left_name' style='padding-left: 10px;'>
+																																	\${elem.mem_name}
+																																</div> 
+																															</div>
+																															<div class='review_title_right' style='padding-right: 8px;'>
+																																\${elem.rev_date}
+																															</div>
+																														</div>
+																														
+																														<div class='review_text'>
+																															<div class='review_text_area' id='\${elem.mem_name}'>
+																																\${elem.rev_cont}
+																															</div>
+																															<div class="review_text_seemore" id="seemore" onclick="showFullReview()">... 더보기</div> 
+																														</div>
+																												
+																														<div style='1; margin-top: 10px;'>
+																															<div class='img_label' viewmode='off' style='background-image: url(/resources/images/\${elem.rev_img})' name='/images/\${elem.rev_img}' onclick='showOriginalRatio()''>
+																															</div>
+																														</div>
+																													</div>` ;
+													           
+																		 // reviews 라는 변수를 review_start 클래스를 가진 div 안에 넣어 안내 내용이 뿌려지게 한다.
+													                	$(reviews).appendTo($(".review_start"));
+													                		   														
+													                	   }); // each
+										                	 		} // if..else            	 		
+															} // if 1 (후기 버튼 클릭시)
+							                	   
+															
+															
+															
+							                		// type 2 (Q&A 버튼 클릭시)
+							                	   else if ($(that).data("no")=="2") {
+							                		   
+							                			 
+							                	   } // if 2 (Q&A 버튼 클릭시)
+							                	   
+							                	   
+							                	   
+							                	   
+							                	   // type 3 (장소 버튼 클릭시)
+							                	   else if ($(that).data("no")=="3") {
+							                		   // 안내, 장소, 환불규정 기존의 내용 없애기 
+							                		   $('.main_tab_wrap').remove();
+							                		   // 후기 기존의 내용 없애기 (후기 있을 때)
+							                		   $('.score_wrap').remove();				                		 
+							                		   // 후기 기존의 내용 없애기 (후기 없을 때)
+							                		   $('#noreviews').remove();
+							                		   
+							                		   
+							                		   // 여기까지 하면 장소 에이작스 메뉴 밑 내용 모두 사라짐
+							                		   
+							                		   
+							                		   
+							                		   // 장소 에이작스 메뉴 밑 내용 새로 뿌리기 위한 main_tab_wrap 클래스를 가지는 div 태그 만들기
+							                	 	   $("#ajaxcontentarea").append(`<div class='main_tab_wrap' style=';'></div>`);
+									                    
+							                		   $( data).each( function (i, elem){
+							                						   // 데이터 뿌리기 위한 정보 가져오기 시작 (정보는 place 라는 변수에 담김)
+											                		   var place = `<div class='main_tab_title'>장소안내</div>
+															                			   <div class='viewpage_text radius_box' style='margin-top:10px; border-radius: 10px 10px 0 0;'>
+															                			     <p>· 장소: \${elem.place}</p>
+															                			     <p>· 주소: \${elem.place_add}</p>
+															                			     <p>· 주차: \${elem.place_park}</p>
+															                			   </div>
+															                			   <div align='center' style='margin-top:10px;'>
+															                			   <div id='map' style='width:100%;height:400px'></div>
+															                			     `;
+							                			 
+														// place 라는 변수를 main_tab_wrap 클래스를 가진 div 안에 넣어 안내 내용이 뿌려지게 한다.
+							                		   $(place).appendTo($(".main_tab_wrap")); 
+							                		   // map이라는 아이디를 가지는 div 바로 다음에 지도가 뿌려지도록 하는 스크립트가 추가된다.  
+							                		   $("#map").append($("<script src='https://maps.googleapis.com/maps/api/js?key=AIzaSyASJkVY1x-BDuG1ySeXbNePbgZ25se-P6w&callback=initMapAjax' async defer><\/script>")); 
+							                		 
+							                		   
+							                		  	 }); // each 					                		   
+							                	   } // if 3 (장소 버튼 클릭시)
+							                	   
+							                	   
+							                	   
+							                	   
+							                	     // type 4 (환불규정 버튼 클릭시)
+													 else if ($(that).data("no")=="4") {
+														// 안내, 장소, 환불규정 기존의 내용 없애기
+														$('.main_tab_wrap').remove();
+														// 후기 기존의 내용 없애기 (후기 있을 때)
+														$('.score_wrap').remove();	
+														// 후기 기존의 내용 없애기 (후기 없을 때)
+														$('#noreviews').remove();
+														
+														
+														// 여기까지 하면 환불규정 에이작스 메뉴 밑 내용 모두 사라짐
+														
+														
+														
+														 // 환불규정 에이작스 메뉴 밑 내용 새로 뿌리기 위한 main_tab_wrap 클래스를 가지는 div 태그 만들기
+								                	 	$("#ajaxcontentarea").append(`<div class='main_tab_wrap' style=';'><p class='main_tab_title'>환불규정 및 안내사항</p></div>`);
+								                	 	// console.log(data);
+								                	 	
+								                	 	$(  data ).each( function (i, elem){
+												                	 		   // 데이터 뿌리기 위한 정보 가져오기 시작 (정보는 ref 라는 변수에 담김)
+													                		   var ref = `<div class='viewpage_text radius_box' style='margin-top:10px; border-radius: 10px 10px 0 0;'>
+																                			   \${elem.ref_rule}
+																                			   \${elem.ref_cau == null?"":elem.ref_cau}
+																                			   \${elem.ref_way}
+															                			   </div>`;
+									                	
+														// ref 라는 변수를 main_tab_wrap 클래스를 가진 div 안에 넣어 안내 내용이 뿌려지게 한다.
+									                	$(ref).appendTo($(".main_tab_wrap")); 
+									                		   
+									                	 }); // each	
+							                	   }// if 4  (환불규정 버튼 클릭시)
+							                  }, error: function ( xhr, errorType){
+							       	        	  alert( errorType );
+							       	          }
+						
+						}); // ajax				 			
+				 }); // click
+			 }) // function 						
+			</script>
+		
+
+
 
 			<!---------------------- 탭 영역 시작 ----------------------->
 			<div id="ajaxcontentarea" class="contentstyle1" style="border-radius: 0 0 10px 10px">
@@ -1664,12 +1875,12 @@ function adjust_ticket(mode, t) {
 					</div>
 
 
-				<c:if test="${not empty idto.info_agenc}">
-					<div style="margin-top: 25px;">
-						<div class="viewpage_noti">기획사 공지사항</div>
-						<div class="viewpage_text radius_box">${idto.info_agenc}</div>
-					</div>
-				</c:if>
+					<c:if test="${not empty idto.info_agenc}">
+						<div style="margin-top: 25px;">
+							<div class="viewpage_noti">기획사 공지사항</div>
+							<div class="viewpage_text radius_box">${idto.info_agenc}</div>
+						</div>
+					</c:if>
 				
 				
 					<div style="margin-top: 25px;">
@@ -1683,20 +1894,32 @@ function adjust_ticket(mode, t) {
 						<div class="info_detail_gradient"></div>
 							
           				
-						<div class="info_detail_btn" id="mdetail_unfold">
+						    <div class="info_detail_btn" id="mdetail_unfold">
 							펼쳐보기 
-							<img src="/resources/images/icon_down.png"
-							style="width: 13px; vertical-align: 2px; padding-left: 10px;">
-							<script>
+							<img src="/resources/images/icon_down.png" style="width: 13px; vertical-align: 2px; padding-left: 10px;">
+							
+          				  
+						</div>
+						</div>
+						
+						
+						<div class="main_img"></div>
+						
+						
+						<script>  
 						   $(function (){
+							   // 펼쳐보기 처음 클릭시 숨겨져있던 이미지들 다 보이게 하는 에이작스 처리
 							   $("#mdetail_unfold").on("click", function (event){
-	                 
+	                 				  
+								   	  // 펼쳐보기 클릭 전 이미지 없애기
 								   	  document.querySelector('.info_detail_gradient').remove();   
 								   	  document.querySelector('.info_detail_btn').remove();     	   
 						              document.querySelector('.info_detail_poster').setAttribute("style", "display:none;");
 						              document.querySelector('.main_img').scrollIntoView({ behavior: 'smooth', block: 'start'});
+				
 						              
 						              var tic_code = "${param.tic_code}";
+						              
 						              $.ajax({
 						                  url:"/ajaxview/imgview",
 						                  dataType:"json",
@@ -1704,19 +1927,14 @@ function adjust_ticket(mode, t) {
 						                  data:{tic_code:tic_code}, 
 						                  cache:false,
 						                  success:function (data, textStatus, jqXHR){
-						                	  console.log(data);
-						                	  // alert( data.tic_pic_in.replaceAll("\"", "\'")  );  
-						                	  // alert( data.tic_pic_in   );  
-						                	  // $("<div><h1>힘들다</h1></div>").insertAfter($("#mdetail_unfold"))
-						                	  // $('.main_img').html( """+ data.tic_pic_in.replaceAll(""","'") + """);
-						                	  // $('.main_img').html( "<h1>힘들다 너무 내가 프로젝트를 너무 많이 한다.</h1>");
-						           
-						                	  $(".main_img").append(`<div style="width: 100%; text-align: center"><br><br></div>\${data.tic_pic_in}`);           	
-						                  }
-						              }); // ajax
-						       
-							   }) // click
-						   }); 			             
+						                  console.log(data);
+						                
+						                  		$(".main_img").html(data.tic_pic_sp);
+						              
+						                  } // success function
+						              }); // ajax					       
+							   }) // click (펼쳐보기)
+						   }); // function		             
           				</script>      
           				
           				<script>
@@ -1725,21 +1943,15 @@ function adjust_ticket(mode, t) {
           			      scrollTo.scrollIntoView({ behavior: "smooth" });
           			    }
           				</script>		  
-          				  
-						</div>
-						</div>
-						
-						<div class="main_img"></div>
-	
 					
-
 					
-
-
 					<div style="margin-top: 25px;">
 						<div class="viewpage_noti">유의사항</div>
 						<div class="viewpage_text radius_box">${idto.info_note}</div>
 					</div>
+
+
+
 
 					<!--------- 장소안내 --------->
 					<div style="margin-top: 25px;">
@@ -1757,6 +1969,8 @@ function adjust_ticket(mode, t) {
 			
 
 
+
+			<!-- 상세페이지 이동시, 안내에서 처음 보여지는 지도 -->
 			<script>
 				var map;
 			
@@ -1782,13 +1996,14 @@ function adjust_ticket(mode, t) {
 			</script>
 			
 			<script src="https://maps.googleapis.com/maps/api/js?
-			key=AIzaSyASJkVY1x-BDuG1ySeXbNePbgZ25se-P6w&callback=initMap" 
-			async defer></script>
+			key=AIzaSyASJkVY1x-BDuG1ySeXbNePbgZ25se-P6w&callback=initMap" async defer></script>
 									
 				    
 									
+					</div>
 			</div>
-	</div>
+			
+			
 
 					<!--------- 판매정보 --------->
 					<div style="margin-top: 25px; margin-bottom: 25px;">
@@ -1803,6 +2018,7 @@ function adjust_ticket(mode, t) {
 								<div>문의전화</div>
 								<div>📞 ${idto.info_num}</div>
 							</div>
+							
 							<c:if test="${not empty idto.info_link}">
 							<div class="viewpage_flex" >
 								<div>문의링크</div>
@@ -1811,14 +2027,18 @@ function adjust_ticket(mode, t) {
 										style="text-decoration: underline;">${idto.info_link}</a>
 								</div>
 								</div>
-								</c:if>
+							</c:if>
 							
 							<div class="viewpage_flex">
 								<div>환불규정</div>
 								<div>
-									<a href="#tab_view" onClick="loadTab(4, this)"><span>환불규정
+								<ul id="refund">
+								<li>
+									<a href="#default" data-no="4"><span>환불규정
 											바로가기</span></a>
-								</div>
+								</li>
+								</ul>
+								</div>						
 							</div>
 							<div class="viewpage_flex">
 								<div>환불방법</div>
@@ -1833,155 +2053,74 @@ function adjust_ticket(mode, t) {
 			
 		</section> 
 		
+		</div>
+  </div>
 		
+			<!-- 안내 에이작스 메뉴영역에 환불규정 바로가기 링크 처음 클릭시 처리되는 에이작스 -->
+			<script>
+						$( function () {
+							$("#refund a").on("click", function (event){
+								// alert("처음 클릭")
+							
+							
+								var tic_code = "${param.tic_code}";
+								var type =  $(this).data("no"); 
+							    var that = this;
+							
+							    
+										$.ajax({
+											url:"/ajaxview/"+type,
+											dataType:"json",
+											data:{tic_code : tic_code},
+											cache:false,
+											success:function (data, textStatus, jqXHR){
+													
+												
+															// 안내, 장소, 환불규정 기존의 내용 없애기
+															$('.main_tab_wrap').remove();
+															// 후기 기존의 내용 없애기 (후기 있을 때)
+															$('.score_wrap').remove();	
+															// 후기 기존의 내용 없애기 (후기 없을 때)
+															$('#noreviews').remove();
+															
+															
+															// 여기까지 하면 환불규정 에이작스 메뉴 밑 내용 모두 사라짐
+															
+															
+															 // 환불규정 에이작스 메뉴 밑 내용 새로 뿌리기 위한 main_tab_wrap 클래스를 가지는 div 태그 만들기
+											        	 	$("#ajaxcontentarea").append(`<div class='main_tab_wrap' style=';'><p class='main_tab_title'>환불규정 및 안내사항</p></div>`);
+											        	 	// console.log(data);
+								        	 	
+											        	 	$( data ).each( function (i, elem){
+													                	 		   // 데이터 뿌리기 위한 정보 가져오기 시작 (정보는 ref 라는 변수에 담김)
+														                		   var ref = `<div class='viewpage_text radius_box' style='margin-top:10px; border-radius: 10px 10px 0 0;'>
+																	                			   \${elem.ref_rule}
+																	                			   \${elem.ref_cau == null?"":elem.ref_cau}
+																	                			   \${elem.ref_way}
+																                			   </div>`;
+											            	
+															// ref 라는 변수를 main_tab_wrap 클래스를 가진 div 안에 넣어 안내 내용이 뿌려지게 한다.
+											            	$(ref).appendTo($(".main_tab_wrap")); 
+											            
+					            		   
+					            	 	}); // each
+									} // success function
+								}); // ajax
+							}) //click
+						}) // function
+			</script>		
+					
+					
+			<!— 안내 에이작스 메뉴영역에 환불규정 바로가기 링크 처음 클릭시 적용되는 css(환불규정 메뉴 문구 빨간색 글자로 변환) —>
+			<script>
+							$(document).ready(function() {
+								  $('#refund a').click(function() {
+										$('#maintab li').removeClass('selected');
+									    $("#refund_link").addClass('selected');
+								  });
+								});
+			</script>
 			
-	</div>
-  </div>
-  	
-
-	<div class="scroll-up visible">
-    	<img src="/resources/images/btn_scrollup.png">
-  	</div>
-
-
-<script>
-    // 클릭시 scroll 이동
-    function moveToSection() {
-      setTimeout(() => { // setTimeout 함수를 사용해서 스크롤 동작을 200밀리초 (0.2초) 후에 실행
-        let topAreaHeight = (document.querySelector('.top_info_section').scrollHeight) + 
-        (document.querySelector('.detail_back').scrollHeight); // 스크롤할 섹션의 높이를 계산 
-          window.scroll({ // 실제 스크롤 기능을 수행 : 이 함수에는 스크롤 동작을 제어하는 다양한 옵션이 포함
-            behavior: 'smooth', // 부드러운 스크롤
-            left: 0, // 가로 방향 스크롤을 0으로 설정
-            top: topAreaHeight - 50 // 스크롤할 섹션의 상단 위치를 설정
-          });
-      }, 200);
-    }
-
-    // scroll-up
-    const scrollUp = document.querySelector('.scroll-up'); //scroll-up 클래스를 가진 요소를 찾아 scrollUp 변수에 할당
-    document.addEventListener('scroll', () => {
-      if (window.scrollY > 500) {
-        scrollUp.classList.add('visible');
-      } else {
-        scrollUp.classList.remove('visible');
-      }
-    });
-    scrollUp.addEventListener('click', () => {
-      document.documentElement.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-      });
-    });
-</script>    
-
-<script>
-    	function viewimg(){
-    		// alert("test");
-  
-				   	  document.querySelector('.info_detail_gradient').remove();   
-				   	  document.querySelector('.info_detail_btn').remove();     	   
-		              document.querySelector('.info_detail_poster').setAttribute("style", "display:none;");
-		              document.querySelector('.main_img').scrollIntoView({ behavior: 'smooth', block: 'start'});
-		              
-		              var tic_code = "${param.tic_code}";
-		              
-		              $.ajax({
-		                  url:"/ajaxview/imgview",
-		                  dataType:"json",
-		                  type:"GET", 
-		                  data:{tic_code:tic_code}, 
-		                  cache:false,
-		                  success:function (data, textStatus, jqXHR){
-		                	  console.log(data);
-		                	  // alert( data.tic_pic_in.replaceAll("\"", "\'")  );  
-		                	  // alert( data.tic_pic_in   );  
-		                	  // $("<div><h1>힘들다</h1></div>").insertAfter($("#mdetail_unfold"))
-		                	  // $('.main_img').html( """+ data.tic_pic_in.replaceAll(""","'") + """);
-		                	  // $('.main_img').html( "<h1>힘들다 너무 내가 프로젝트를 너무 많이 한다.</h1>");
-		                	  $(".main_img").append(`<div style="width: 100%; text-align: center"><br><br></div>\${data.tic_pic_in}`);           	
-                	
-		                  } // function
-		              }) // ajax
-		   }; 			             
-</script>
-
-
-
-<!-- 나중에 지울거 -->
-<!-- 
-<div style="background-color: #ffffff; border-top: 1px solid #eee;">
-
-  <div style="width: 1100px; margin: auto; display:flex; padding: 40px 0;">
-    1열
-    <div style="width:290px; border-right: 1px solid #e5e5e5">
-      <div style="font-size:20px; font-weight:600; color:#000;">
-        <a href="https://timeticket.co.kr/bbs_list.php?tb=board_faq">
-          고객센터 <span style="vertical-align:1px; padding-left:3px;">&gt;</span>
-        </a>
-      </div>
-      <div style="font-size:24px; font-weight:800; color:#000; margin-top:20px;">
-        1599-3089
-      </div>
-      <div style="font-size:14px; color:#444; margin-top:7px;">
-        월-금 10:00-18:00 (주말·공휴일 휴무)
-      </div>
-      <div>
-        <img src="img/logo/logo_web3.png" style="width:140px; margin-top:57px;">
-      </div>
-    </div>
-
-    2열
-    <div style="width:260px; margin-left:30px; border-right: 1px solid #e5e5e5" "="">
-      <div class="bottom_menu">
-        <a href="https://timeticket.co.kr/section.php?page=company">회사소개</a>
-      </div>
-      <div class="bottom_menu">
-        <a href="https://timeticket.co.kr/html_file.php?file1=default.html&amp;file2=user_stipulation.html">이용약관</a>
-      </div>
-      <div class="bottom_menu">
-        <a href="https://timeticket.co.kr/html_file.php?file1=default.html&amp;file2=user_defend.html">개인정보처리방침</a>
-      </div>
-      <div class="bottom_menu" style="color:#ff4b4b; font-weight:700;">
-        <a href="https://timeticket.co.kr/section.php?page=partner" style="color:#ff4b4b;">제휴문의</a>
-      </div>
-      <div class="bottom_menu" style="margin-bottom:0;">
-        <a href="https://timeticket.co.kr/bbs_list.php?tb=board_notice">공지사항</a>
-      </div>
-    </div>
-
-    3열
-    <div style="margin-left:30px;">
-
-      <div class="bottom_btns">
-        <a href="https://timeticket.co.kr/bbs_list.php?tb=board_faq">
-          <div>🤔자주묻는질문</div>
-        </a>
-        <a href="https://timeticket.co.kr/bbs_list.php?tb=board_private">
-          <div>📝1:1 문의하기</div>
-        </a>
-        <a href="https://timeticket.co.kr/bbs_list.php?tb=board_notice">
-          <div style="margin-right:0;">📮공지사항</div>
-        </a>
-      </div>
-
-      <div style="margin-top:25px; font-size:14px; color:#888; line-height:160%;">
-        (주)타임티켓&nbsp;|&nbsp;대표이사: 김성우&nbsp;|&nbsp;서울특별시 영등포구 영등포로22길 3-3, 201호<br>
-        사업자등록번호: 105-87-89446 <a href="https://www.ftc.go.kr/bizCommPop.do?wrkr_no=1058789446" target="_blank"><span style="color:#666; text-decoration:underline; font-size:12px; vertical-align:1px; margin-left:2px;">사업자정보확인</span></a><br>
-        통신판매업신고: 2021-서울금천-2574<br>
-				개인정보관리책임자 : 장인범 (help@timeticket.co.kr)<br>
-        Hosting by 심플렉스인터넷(주)&nbsp;&nbsp;|&nbsp;&nbsp;Copyright @ Time Ticket All Rigdhts Reserved
-      </div>
-
-    </div>
-  </div>
- -->
-<!-- 지울거 여기까지 -->
-
-
-</div>
-
-
 
 </body>
 </html>
