@@ -327,7 +327,7 @@
  --%>
  <div class="basket_title" style="margin-top:20px;">
     <span>총 결제금액
-    <span id="total_price_view" class="pay_total pay_total_price" value="17000">17,000원</span>
+    <span id="total_price_view" class="pay_total pay_total_price" value="${param.gwon_pay}"><fmt:formatNumber type="number" value="${param.gwon_pay}" pattern="#,### 원" /></span>
     <span id="total_point_view" class="pay_total_point"></span>
     </span>
   </div>
