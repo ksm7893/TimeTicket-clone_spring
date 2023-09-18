@@ -3,6 +3,7 @@
 <%@ page session="false" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <html>
 <head>
 <meta charset="UTF-8">
@@ -262,48 +263,24 @@
   </div>
   <form action="/timeticket/pay.do" method="post">
   <div class="basket_title">예매정보</div>
-  <!-- basket_order.php 에서 변경 -->
- <%-- 
-      <c:forEach items="s">
-      <div style='margin-top:10px; border:1px solid #d2d2d2; border-radius: 10px; background:#fff; padding:10px 25px; font-size:15px; color:#313131; line-height:160%;'>
-        <div class='option_title' style='width:90px; float:left; color:#888'>선택옵션</div>
-        <div style='width:100%;'>${ param.날짜 }[${ param.요일 }] ${ param.시간 } ${ param.권종이름 }</div>
-        <div class='option_title' style='width:90px; float:left; color:#888'>티켓가격</div>
-        <div style='width:100%;'>${ param.금액 } 원</div>
-        <div class='option_title' style='width:90px; float:left; color:#888'>수량</div>
-        <div style='width:100%; vertical-align:bottom;'>${ param.수량 } 매</div>
-        <div style='clear:both;'></div>
-        <div class='option_title' style='width:90px; float:left; color:#888'>티켓합계</div>
-        <!-- 이 부분 id값이 바뀜 -->
-        <div style='width:100%; vertical-align:bottom;'>
-          <span id='row_price_view_237850'>${ param.금액 }*${ param.수량 }</span> 원
-          <input type='hidden' name='row_price_value_237850' id='row_price_value_237850' value='33600'>
+     
+        <div style="margin-top:10px; border:1px solid #d2d2d2; border-radius: 10px; background:#fff; padding:10px 25px; font-size:15px; color:#313131; line-height:160%;">
+            <div class="option_title" style="width:90px; float:left; color:#888">선택옵션</div>
+            <div style="width:100%;">${param.month}.${param.date}${param.day} ${param.o_time} ${param.gwon_name}</div>
+            <input type="hidden" name="gwon_code" value="${param.gwon_code}">
+            <div class="option_title" style="width:90px; float:left; color:#888">티켓가격</div>
+            <div style="width:100%;"><fmt:formatNumber type="number" value="${param.gwon_pay}" pattern="#,### 원" /></div>
+            <div class="option_title" style="width:90px; float:left; color:#888">수량</div>
+            <div style="width:100%; vertical-align:bottom;">1 매</div>
+            <input type="hidden" name="book_cnt" value="1">
+            <div style="clear:both;"></div>
+            <div class="option_title" style="width:90px; float:left; color:#888">티켓합계</div>
+            <div style="width:100%; vertical-align:bottom;">
+                <span id="row_price_view_1"><fmt:formatNumber type="number" value="${param.gwon_pay}" pattern="#,### 원" /></span>
+                <input type="hidden" name="book_price" id="row_price_value_1" value="${param.gwon_pay}">
+            </div>
         </div>
-      </div>
-      </c:forEach>
-      
-        <div style='width:100%; vertical-align:bottom;'>
-          <span id='row_price_view_232273'>17,900</span> 원
-          <input type='hidden' name='row_price_value_232273' id='row_price_value_232273' value='17900'>
-        </div>
-     --%>
-     <div style="margin-top:10px; border:1px solid #d2d2d2; border-radius: 10px; background:#fff; padding:10px 25px; font-size:15px; color:#313131; line-height:160%;">
-        <div class="option_title" style="width:90px; float:left; color:#888">선택옵션</div>
-        <div style="width:100%;">7.21[금] 16:45 ★타임세일★</div>
-        <input type="hidden" name="gwon_code" value="gwon_118">
-        <div class="option_title" style="width:90px; float:left; color:#888">티켓가격</div>
-        <div style="width:100%;">17,000 원</div>
-        <div class="option_title" style="width:90px; float:left; color:#888">수량</div>
-        <div style="width:100%; vertical-align:bottom;">1 매</div>
-        <input type="hidden" name="book_cnt" value="1">
-        <div style="clear:both;"></div>
-        <div class="option_title" style="width:90px; float:left; color:#888">티켓합계</div>
-        <div style="width:100%; vertical-align:bottom;">
-          <span id="row_price_view_222529">17,000</span> 원
-          <input type="hidden" name="book_price" id="row_price_value_222529" value="17000">
-        </div>
-      </div>
-
+ 
   <div class="basket_title">이용자정보</div>
   <div class="basket_text">
     <p>· 실제로 관람/이용하실 분의 실명/연락처를 입력해 주세요.</p>
@@ -451,7 +428,7 @@
   
   <div class="basket_title">
     ※ 티켓 환불규정
-    <span class="policy_slide" style="margin-left:34px;" onclick="toggleSlide(POLICY_CONTENTS[0])">보기</span>
+    <span class="policy_slide" style="margin-left:34px;">보기</span>
     <div class="policy_contents">
       <div class="refund_txt">
         ${ dto2.ref_rule }
@@ -463,7 +440,7 @@
 
   <div class="basket_title" style="padding-top:10px;">
     ※ 주의사항 및 약관
-    <span class="policy_slide" onclick="toggleSlide(POLICY_CONTENTS[1])">보기</span>
+    <span class="policy_slide">보기</span>
       <div class="policy_contents">
          <div class="refund_txt">
             <p class='viewpage_noti'>[예매시 주의사항]</p>
@@ -504,7 +481,11 @@
 
     </div>
   </div>
- 
+
+
+</body>
+</html>
+
 <script src="https://cdn.iamport.kr/v1/iamport.js"></script>
 <script>
 //휴대폰번호 하이픈 자동생성
@@ -529,12 +510,13 @@ const AUTO_HYPHEN_PHONE = (number) => {
     PHONE_INPUT_BOX.value = PHONE_NUMBER_WITH_HYPHEN;
     PHONE_INPUT_BOX.setAttribute('value', PHONE_NUMBER_WITH_HYPHEN);
   };  
-  
+ 
   
 </script>
 
 <script>
 
+// 유의사항 노출(토스&무통장입금)
 $(":radio").on("click",function(){
    if($(this).val().indexOf("토스페이") == 0) {
       $("#payment_tosspay_noti").css("display","block");
@@ -551,24 +533,32 @@ $(":radio").on("click",function(){
    
 });
 
+// 결제정보 검증 & 클릭시 결제정보 db입력
 $("#pay_confirm").on("click",function(){
    const NAME_REGX = /[^a-z|A-Z|ㄱ-ㅎ|가-힣]+$/i;
+   const name = $(":text[name=name]").val();
+   const phone = $(":text[name=hphone]").val();
+   const email = $(":text[name=email]").val();  
+   const price = $(".pay_total_price").val() - $(".pay_total_point").val();
    
    if(!($(":radio").is(":checked"))){
       alert("결제 방법을 선택해주세요")
       return ;
-   }else if(NAME_REGX.test($(":text[name=name]").val())){
+   }else if(NAME_REGX.test(name)){
       alert("이름은 한글 또는 영문으로만 입력해주세요.");
-      $(":text[name=name]").focus();
+      $("#user_name").focus();
       return;
-   }else if($(":text[name=name]").val().length < 2){
-      alert("이용자 이름을 입력해 주세요")
+   }else if(name.length < 2){
+      alert("이용자 이름을 입력해 주세요");
+      $("#user_name").focus();
       return ;
-   }else if($(":text[name=hphone]").val().length < 10){
-      alert("휴대폰 번호를 입력해 주세요")     
+   }else if(phone.length < 10){
+      alert("휴대폰 번호를 입력해 주세요");
+      $("#user_hphone").focus();
       return ;
-   }else if($(":text[name=email]").val().length < 7){
-      alert("E-Mail을 입력해 주세요")       
+   }else if(email.length < 7){
+      alert("E-Mail을 입력해 주세요");
+      $("#user_email").focus();
       return ;
    }else if(!($("#check_1").is(":checked"))){
       alert("환불규정, 주의사항, 약관에 동의하셔야 예매가 가능합니다")
@@ -582,36 +572,31 @@ $("#pay_confirm").on("click",function(){
    }
 });
 
+// 환불규정 보기 처리 
 $(".policy_slide:first").on("click", function() {
    var policyContents = $(".policy_contents");
-    if (policyContents.first().css("display") === "none") {
-        policyContents.first().css("display", "block");
-    } else {
-       policyContents.first().css("display", "none");
-    }
+   var firstPolicyContent = policyContents.first();
+   if (firstPolicyContent.css("display") === "none") {
+       firstPolicyContent.slideDown("normal");
+       firstPolicyContent[0].scrollIntoView({ behavior: "smooth" });
+   } else {
+       firstPolicyContent.slideUp("normal");
+       lastPolicyContent[0].scrollIntoView({ behavior: "smooth" });
+   }
 });
 
+// 주의사항 보기 처리 
 $(".policy_slide:last").on("click", function() {
    var policyContents = $(".policy_contents");
-    if (policyContents.last().css("display") === "none") {
-        policyContents.last().css("display", "block");
+   var lastPolicyContent = policyContents.last();
+    if (lastPolicyContent.css("display") === "none") {
+    	lastPolicyContent.slideDown("normal");
+    	lastPolicyContent[0].scrollIntoView({ behavior: "smooth" });
     } else {
-       policyContents.last().css("display", "none");
+    	lastPolicyContent.slideUp("normal");
+    	lastPolicyContent[0].scrollIntoView({ behavior: "smooth" });
     }
 });
 
-$(".use_point_btn").on("click", function(event) {
-
-   if($(".input_detail").val() < 500){
-       alert("포인트는 최소 500P부터 사용 가능해요.");
-       $(".input_detail").focus();
-       return;
-    }
-   
-});
 
 </script>
-
-
-</body>
-</html>

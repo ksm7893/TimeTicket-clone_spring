@@ -13,6 +13,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import lombok.AllArgsConstructor;
@@ -48,17 +49,39 @@ public class PayController {
   @RequestParam("mem_id") String mem_id
 , @RequestParam("pay_code") String pay_code
 , @RequestParam("gwon_code") String gwon_code
-, @RequestParam("book_price") int book_price
+, @RequestParam("book_price") int gwon_pay
 , @RequestParam("book_cnt") int book_cnt
 , @RequestParam("book_point") int book_point) {
 
-		int insertCount = this.payMapper.inpay(mem_id, pay_code, gwon_code, book_price, book_cnt, book_point);
+		int insertCount = this.payMapper.inpay(mem_id, pay_code, gwon_code, gwon_pay, book_cnt, book_point);
 		
 		if(insertCount ==1) {
-			return "redirect:/timeticket/main.do";
+			return "redirect:/timeticket/review.do";
 		} else {
 			return "pay";
 		}
+		
+	}
+	
+	@RequestMapping(value = "/pay", method = RequestMethod.GET)
+	public String pay(@RequestParam("gwon_name") String gwon_name
+	,@RequestParam("month") int month
+	,@RequestParam("date") int date
+	,@RequestParam("day") String day
+	,@RequestParam("o_time") String o_time
+	,@RequestParam("gwon_code") String gwon_code
+	,@RequestParam("gwon_pay") int gwon_pay
+	, Model model) {
+		
+		model.addAttribute("gwon_name", gwon_name);
+		model.addAttribute("month", month);
+		model.addAttribute("date", date);
+		model.addAttribute("day", day);
+		model.addAttribute("o_time", o_time);
+		model.addAttribute("gwon_code", gwon_code);
+		model.addAttribute("gwon_pay", gwon_pay);
+		
+		return "pay";
 		
 	}
 	
