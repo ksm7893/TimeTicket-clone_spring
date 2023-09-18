@@ -49,11 +49,11 @@ public class PayController {
   @RequestParam("mem_id") String mem_id
 , @RequestParam("pay_code") String pay_code
 , @RequestParam("gwon_code") String gwon_code
-, @RequestParam("book_price") int gwon_pay
+, @RequestParam("book_price") int book_price
 , @RequestParam("book_cnt") int book_cnt
 , @RequestParam("book_point") int book_point) {
 
-		int insertCount = this.payMapper.inpay(mem_id, pay_code, gwon_code, gwon_pay, book_cnt, book_point);
+		int insertCount = this.payMapper.inpay(mem_id, pay_code, gwon_code, book_price, book_cnt, book_point);
 		
 		if(insertCount ==1) {
 			return "redirect:/timeticket/review.do";
